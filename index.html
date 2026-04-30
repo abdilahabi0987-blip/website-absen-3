@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Absensi Akuntansi 2 | Dashboard & Riwayat</title>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Chart.js untuk grafik dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="glass-bg"></div>
+
+    <div class="container">
+      <div class="header">
+        <div class="title-section">
+          <h1>
+            <i class="fas fa-chalkboard-user"></i> Absensi
+            <span class="highlight">Akuntansi 2</span>
+          </h1>
+          <p class="subtitle">Full senyum • Full dana • Full berkah</p>
+          <div class="date-badge" id="dateBadge">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="currentDate"></span>
+          </div>
+        </div>
+        <div class="stats-card">
+          <div class="stat-item">
+            <span class="stat-label">Total Siswa</span>
+            <span class="stat-value" id="totalSiswa">44</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">✅ Hadir</span>
+            <span class="stat-value" id="totalHadir">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">📋 Izin</span>
+            <span class="stat-value" id="totalIzin">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">🤒 Sakit</span>
+            <span class="stat-value" id="totalSakit">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">❌ Alpa</span>
+            <span class="stat-value" id="totalAlpa">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <button class="tab-btn active" data-tab="absen">
+          <i class="fas fa-clipboard-list"></i> Absen Hari Ini
+        </button>
+        <button class="tab-btn" data-tab="dashboard">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="tab-btn" data-tab="riwayat">
+          <i class="fas fa-history"></i> Riwayat Bulanan
+        </button>
+      </div>
+
+      <!-- TAB 1: ABSENSI -->
+      <div id="tabAbsen" class="tab-content active">
+        <div class="action-bar">
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+              Semua <i class="fas fa-users"></i>
+            </button>
+            <button class="filter-btn" data-filter="Hadir">
+              Hadir <i class="fas fa-check-circle"></i>
+            </button>
+            <button class="filter-btn" data-filter="Izin">
+              Izin <i class="fas fa-file-alt"></i>
+            </button>
+            <button class="filter-btn" data-filter="Sakit">
+              Sakit <i class="fas fa-thermometer-half"></i>
+            </button>
+            <button class="filter-btn" data-filter="Alpa">
+              Alpa <i class="fas fa-times-circle"></i>
+            </button>
+          </div>
+          <div class="reset-btn">
+            <button id="resetAllBtn">
+              <i class="fas fa-undo-alt"></i> Reset Hari Ini
+            </button>
+          </div>
+        </div>
+
+        <div class="student-table-wrapper">
+          <table class="student-table" id="studentTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Siswa</th>
+                <th colspan="4">Status Kehadiran</th>
+              </tr>
+              <tr class="status-row">
+                <th></th>
+                <th></th>
+                <th>Hadir <i class="fas fa-user-check"></i></th>
+                <th>Izin <i class="fas fa-envelope-open-text"></i></th>
+                <th>Sakit <i class="fas fa-head-side-medical"></i></th>
+                <th>Alpa <i class="fas fa-user-slash"></i></th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: DASHBOARD -->
+      <div id="tabDashboard" class="tab-content">
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3><i class="fas fa-chart-simple"></i> Statistik Bulan Ini</h3>
+            <canvas id="statusChart" width="400" height="300"></canvas>
+          </div>
+          <div class="dashboard-card">
+            <h3>
+              <i class="fas fa-calendar-week"></i> Ringkasan Bulan
+              <span id="monthYearLabel"></span>
+            </h3>
+            <div class="summary-stats">
+              <div class="summary-item">
+                <span class="summary-label">Total Absensi</span>
+                <span class="summary-value" id="summaryTotal">0</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Rata-rata Kehadiran</span>
+                <span class="summary-value" id="summaryAvg">0%</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Siswa Terbaik</span>
+                <span class="summary-value" id="topStudent">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <h3><i class="fas fa-chart-line"></i> Tren 7 Hari Terakhir</h3>
+            <canvas id="trendChart" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: RIWAYAT BULANAN -->
+      <div id="tabRiwayat" class="tab-content">
+        <div class="riwayat-controls">
+          <div class="month-picker">
+            <label
+              ><i class="fas fa-calendar-alt"></i> Pilih Bulan & Tahun:</label
+            >
+            <input type="month" id="monthPicker" value="" />
+          </div>
+          <div class="riwayat-actions">
+            <button id="exportRiwayatBtn">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+          </div>
+        </div>
+        <div class="riwayat-table-wrapper">
+          <table class="riwayat-table" id="riwayatTable">
+            <thead id="riwayatHeader">
+              <!-- Header akan di-generate JS -->
+            </thead>
+            <tbody id="riwayatBody">
+              <!-- Data riwayat per siswa -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <p>
+          <i class="fas fa-magic"></i> klik status untuk mengganti • auto-save
+          ke lokal • dashboard & riwayat bulanan
+        </p>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
